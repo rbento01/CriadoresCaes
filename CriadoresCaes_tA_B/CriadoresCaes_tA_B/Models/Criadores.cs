@@ -10,6 +10,10 @@ namespace CriadoresCaes_tA_B.Models {
    /// </summary>
    public class Criadores {
 
+      public Criadores() {
+         // inicializar a lista de Cães do Criador
+         ListaDeCaes = new HashSet<CriadoresCaes>();
+      }
 
       /// <summary>
       /// identificador do Criador
@@ -46,5 +50,11 @@ namespace CriadoresCaes_tA_B.Models {
       /// </summary>
       public string Email { get; set; }
 
+      // ############################################
+
+      /// <summary>
+      /// lista dos Cães associados ao Criador
+      /// </summary>
+      public ICollection<CriadoresCaes> ListaDeCaes { get; set; }
    }
 }

@@ -10,6 +10,11 @@ namespace CriadoresCaes_tA_B.Models {
    /// </summary>
    public class Racas {
 
+      public Racas() {
+         // procurar os Cães de cada Raça e criar, para cada Raça, uma lista com os seus cães
+         ListaDeCaes = new HashSet<Caes>();
+      }
+
       /// <summary>
       /// Identificador de cada uma das Raças
       /// </summary>
@@ -20,5 +25,18 @@ namespace CriadoresCaes_tA_B.Models {
       /// </summary>
       public string  Designacao { get; set; }
 
+      //*********************************************************
+
+      // uma raça está associada a muitos cães
+      // uma raca tem uma lista de cães
+      /// <summary>
+      /// Lista dos Cães que são da raça
+      /// </summary>
+      public ICollection<Caes> ListaDeCaes { get; set; }
+      /* SELECT *
+       * FROM Caes c
+       * WHERE c.RacaFK = ?? 
+       *
+       */
    }
 }
