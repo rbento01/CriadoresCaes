@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace CriadoresCaes_tA_B.Models {
 
    /// <summary>
-   /// descrição de cada um dos cães
+   /// descrição de cada um dos Cães do criador
    /// </summary>
    public class Caes {
 
