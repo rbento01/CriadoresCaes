@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace CriadoresCaes_tA_B.Models {
    public class CriadoresCaes {
+
+      /// <summary>
+      /// PK para a tabela do relacionamento entre Cães e Criadores
+      /// </summary>
+      [Key]
+      public int Id { get; set; }
 
 
       /// <summary>

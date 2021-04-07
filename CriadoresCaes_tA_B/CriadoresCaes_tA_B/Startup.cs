@@ -37,6 +37,8 @@ namespace CriadoresCaes_tA_B {
             options => options.UseSqlServer( Configuration.GetConnectionString("myConnectionString")  )
             );
 
+         //Install-Package Microsoft.EntityFrameworkCore.SqlServer -Version 5.0.4
+
          //************************************************************
 
 
