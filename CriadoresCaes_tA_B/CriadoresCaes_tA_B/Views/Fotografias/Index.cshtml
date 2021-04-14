@@ -1,0 +1,58 @@
+﻿@model IEnumerable<CriadoresCaes_tA_B.Models.Fotografias>
+@* Esta View está a processar uma lista de fotografias que lhe foi enviada pelo Controller *@
+
+
+@{
+   ViewData["Title"] = "Lista de Fotografias";
+}
+
+<h1>Lista de Fotografias dos Cães</h1>
+
+<p>
+   <a asp-action="Create">Adicionar nova Fotografia</a>
+</p>
+
+<table class="table">
+   <thead>
+      <tr>
+         <th>
+            @* vai ao modelo, e mostra o nome do atributo referido *@
+            @Html.DisplayNameFor(model => model.Fotografia)
+         </th>
+         <th>
+            @Html.DisplayNameFor(model => model.DataFoto)
+         </th>
+         <th>
+            @Html.DisplayNameFor(model => model.Cao)
+         </th>
+         <th></th>
+      </tr>
+   </thead>
+   <tbody>
+      @foreach (var item in Model) {
+         <tr>
+            <td>
+               @* invoca o valor existente no Modelo com o conteúdo deste atributo *@
+               
+               <img src="~/fotos/@Html.DisplayFor(modelItem => item.Fotografia)"
+                    width="50"
+                    alt="Fotografia do cão @Html.DisplayFor(modelItem => item.Cao.Nome)"
+                    title="@Html.DisplayFor(modelItem => item.Cao.Nome)"/>
+            </td>
+            <td>
+               @Html.DisplayFor(modelItem => item.DataFoto)
+            </td>
+            <td>
+               <a asp-action="Details" asp-controller="Caes" asp-route-id="@item.Cao.Id">
+                  @Html.DisplayFor(modelItem => item.Cao.Nome)
+               </a>
+            </td>
+            <td>
+               <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+               <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
+               <a asp-action="Delete" asp-route-id="@item.Id">Apagar</a>
+            </td>
+         </tr>
+      }
+   </tbody>
+</table>

@@ -27,6 +27,7 @@ namespace CriadoresCaes_tA_B.Models {
       /// <summary>
       /// Data da fotografia
       /// </summary>
+      [Display(Name = "Data da fotografia")]
       public DateTime DataFoto { get; set; }
 
       /// <summary>
