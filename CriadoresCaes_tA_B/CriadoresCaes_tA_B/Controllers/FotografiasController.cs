@@ -41,7 +41,7 @@ namespace CriadoresCaes_tA_B.Controllers {
          *  | um símbolo que separa os ramos da expressão
          *  |
          *  representa todos registos das fotografias
-         */ 
+         */
          var fotografias = _context.Fotografias.Include(f => f.Cao);
 
          // invoca a View, entregando-lhe a lista de registos
@@ -67,25 +67,71 @@ namespace CriadoresCaes_tA_B.Controllers {
          return View(fotografias);
       }
 
+
+
+
+
       // GET: Fotografias/Create
+      // [HttpGet]    não preciso desta definição, pois por omissão ele responde sempre em GET
+      /// <summary>
+      /// invoca, na primeira vez, a View com os dados de criação de uma fotografia
+      /// </summary>
+      /// <returns></returns>
       public IActionResult Create() {
-         ViewData["CaoFK"] = new SelectList(_context.Caes, "Id", "Id");
+
+         /* geração da lista de valores disponíveis na DropDown
+          * o ViewData transporta dados a serem associados ao atributo 'CaoFK'
+          * o SelectList é um tipo de dados especial que serve para armazenar a lista 
+          * de opções de um objeto do tipo <SELECT> do HTML
+          * Contém dois valores: ID + nome a ser apresentado no ecrã
+          * 
+          * _context.Caes : representa a fonte dos dados
+          *                 na prática estamos a executar o comando SQL
+          *                 SELECT * FROM Caes
+          * 
+          * vamos alterar a pesquisa para significar
+          * SELECT * FROM Caes ORDER BY Nome
+          * e, a minha expressão fica: _context.Caes.OrderBy(c=>c.Nome)
+          * 
+         */
+         ViewData["CaoFK"] = new SelectList(_context.Caes.OrderBy(c => c.Nome), "Id", "Nome");
+
+
          return View();
       }
+
+
+
 
       // POST: Fotografias/Create
       // To protect from overposting attacks, enable the specific properties you want to bind to.
       // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
       [HttpPost]
       [ValidateAntiForgeryToken]
-      public async Task<IActionResult> Create([Bind("Id,Fotografia,DataFoto,Local,CaoFK")] Fotografias fotografias) {
-         if (ModelState.IsValid) {
-            _context.Add(fotografias);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+      public async Task<IActionResult> Create([Bind("Id,Fotografia,DataFoto,Local,CaoFK")] Fotografias foto) {
+
+         // avaliar se  o utilizador escolheu uma opção válida na dropdown do Cão
+         if (foto.CaoFK > 0) {
+            if (ModelState.IsValid) {
+               try {
+                  _context.Add(foto);
+                  await _context.SaveChangesAsync();
+                  return RedirectToAction(nameof(Index));
+               }
+               catch (Exception ex) {
+                  ModelState.AddModelError("", "Ocorreu um erro...");
+
+               }
+            }
          }
-         ViewData["CaoFK"] = new SelectList(_context.Caes, "Id", "Id", fotografias.CaoFK);
-         return View(fotografias);
+         else {
+            // não foi escolhido um cão válido 
+            ModelState.AddModelError("","Não se esqueça de escolher um cão...");
+         }
+                  
+         ViewData["CaoFK"] = new SelectList(_context.Caes.OrderBy(c => c.Nome), "Id", "Nome", foto.CaoFK);
+       
+         return View(foto);
       }
 
       // GET: Fotografias/Edit/5
@@ -98,7 +144,9 @@ namespace CriadoresCaes_tA_B.Controllers {
          if (fotografias == null) {
             return NotFound();
          }
-         ViewData["CaoFK"] = new SelectList(_context.Caes, "Id", "Id", fotografias.CaoFK);
+        
+         ViewData["CaoFK"] = new SelectList(_context.Caes.OrderBy(c => c.Nome), "Id", "Nome", fotografias.CaoFK);
+        
          return View(fotografias);
       }
 

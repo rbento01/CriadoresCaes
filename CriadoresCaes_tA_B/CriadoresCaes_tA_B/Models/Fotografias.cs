@@ -39,6 +39,7 @@ namespace CriadoresCaes_tA_B.Models {
 
       // criação da FK que referencia o Cão a quem a Foto pertence
       [ForeignKey(nameof(Cao))]
+      [Display(Name ="Cão")]
       public int CaoFK { get; set; }
       public Caes Cao { get; set; }
    }
