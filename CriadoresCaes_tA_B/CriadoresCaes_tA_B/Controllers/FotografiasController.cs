@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CriadoresCaes_tA_B.Data;
 using CriadoresCaes_tA_B.Models;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace CriadoresCaes_tA_B.Controllers {
 
@@ -17,8 +20,16 @@ namespace CriadoresCaes_tA_B.Controllers {
       /// </summary>
       private readonly CriadoresCaesDB _context;
 
-      public FotografiasController(CriadoresCaesDB context) {
+      /// <summary>
+      /// este atributo contém os dados da app web no servidor
+      /// </summary>
+      private readonly IWebHostEnvironment _caminho;
+
+      public FotografiasController(
+         CriadoresCaesDB context,
+         IWebHostEnvironment caminho) {
          _context = context;
+         _caminho = caminho;
       }
 
       // GET: Fotografias
@@ -108,29 +119,97 @@ namespace CriadoresCaes_tA_B.Controllers {
       // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
       [HttpPost]
       [ValidateAntiForgeryToken]
-      public async Task<IActionResult> Create([Bind("Id,Fotografia,DataFoto,Local,CaoFK")] Fotografias foto) {
+      public async Task<IActionResult> Create([Bind("DataFoto,Local,CaoFK")] Fotografias foto, IFormFile fotoCao) {
 
          // avaliar se  o utilizador escolheu uma opção válida na dropdown do Cão
-         if (foto.CaoFK > 0) {
-            if (ModelState.IsValid) {
-               try {
-                  _context.Add(foto);
-                  await _context.SaveChangesAsync();
-                  return RedirectToAction(nameof(Index));
-               }
-               catch (Exception ex) {
-                  ModelState.AddModelError("", "Ocorreu um erro...");
+         if (foto.CaoFK < 0) {
+            // não foi escolhido um cão válido 
+            ModelState.AddModelError("", "Não se esqueça de escolher um cão...");
+            // devolver o controlo à View
+            ViewData["CaoFK"] = new SelectList(_context.Caes.OrderBy(c => c.Nome), "Id", "Nome");
+            return View(foto);
+         }
 
-               }
-            }
+
+         /* processar o ficheiro
+          *   - existe ficheiro?
+          *     - se não existe, o q fazer?  => gerar uma msg erro, e devolver controlo à View
+          *     - se continuo, é pq ficheiro existe
+          *       - mas, será q é do tipo correto?
+          *         - avaliar se é imagem,
+          *           - se sim: - especificar o seu novo nome
+          *                     - associar ao objeto 'foto', o nome deste ficheiro
+          *                     - especificar a localização                     
+          *                     - guardar ficheiro no disco rígido do servidor
+          *           - se não  => gerar uma msg erro, e devolver controlo à View
+         */
+
+         // var auxiliar
+         string nomeImagem = "";
+
+         if (fotoCao == null) {
+            // não há ficheiro
+            // adicionar msg de erro
+            ModelState.AddModelError("", "Adicione, por favor, a fotografia do cão");
+            // devolver o controlo à View
+            ViewData["CaoFK"] = new SelectList(_context.Caes.OrderBy(c => c.Nome), "Id", "Nome");
+            return View(foto);
          }
          else {
-            // não foi escolhido um cão válido 
-            ModelState.AddModelError("","Não se esqueça de escolher um cão...");
+            // há ficheiro. Mas, será um ficheiro válido?
+            // https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+            if (fotoCao.ContentType == "image/jpeg" || fotoCao.ContentType == "image/png") {
+               // definir o novo nome da fotografia     
+               Guid g;
+               g = Guid.NewGuid();
+               nomeImagem = foto.CaoFK + "_" + g.ToString(); // tb, poderia ser usado a formatação da data atual
+               // determinar a extensão do nome da imagem
+               string extensao = Path.GetExtension(fotoCao.FileName).ToLower();
+               // agora, consigo ter o nome final do ficheiro
+               nomeImagem = nomeImagem + extensao;
+
+               // associar este ficheiro aos dados da Fotografia do cão
+               foto.Fotografia = nomeImagem;
+
+               // localização do armazenamento da imagem
+               string localizacaoFicheiro = _caminho.WebRootPath;
+               nomeImagem = Path.Combine(localizacaoFicheiro, "fotos", nomeImagem);
+            }
+            else {
+               // ficheiro não é válido
+               // adicionar msg de erro
+               ModelState.AddModelError("", "Só pode escolher uma imagem para a associar ao cão");
+               // devolver o controlo à View
+               ViewData["CaoFK"] = new SelectList(_context.Caes.OrderBy(c => c.Nome), "Id", "Nome");
+               return View(foto);
+            }
          }
-                  
+
+
+         if (ModelState.IsValid) {
+            try {
+               // adicionar os dados da nova fotografia à base de dados
+               _context.Add(foto);
+               // consolidar os dados na base de dados
+               await _context.SaveChangesAsync();
+
+               // se cheguei aqui, tudo correu bem
+               // vou guardar, agora, no disco rígido do Servidor a imagem
+               using var stream = new FileStream(nomeImagem, FileMode.Create);
+               await fotoCao.CopyToAsync(stream);
+
+
+               return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex) {
+               ModelState.AddModelError("", "Ocorreu um erro...");
+
+            }
+         }
+
+
          ViewData["CaoFK"] = new SelectList(_context.Caes.OrderBy(c => c.Nome), "Id", "Nome", foto.CaoFK);
-       
+
          return View(foto);
       }
 
@@ -144,9 +223,9 @@ namespace CriadoresCaes_tA_B.Controllers {
          if (fotografias == null) {
             return NotFound();
          }
-        
+
          ViewData["CaoFK"] = new SelectList(_context.Caes.OrderBy(c => c.Nome), "Id", "Nome", fotografias.CaoFK);
-        
+
          return View(fotografias);
       }
 

@@ -9,7 +9,12 @@
 <hr />
 <div class="row">
    <div class="col-md-4">
-      <form asp-action="Create">
+      @*
+            se não adicionarmos o atributo
+                     enctype="multipart/form-data"
+            não conseguimos enviar os ficheiros para o servidor *@
+      <form asp-action="Create" method="post" enctype="multipart/form-data">
+
          @* esta DIV é o local onde os erros gerados na app serão reportados *@
          <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -18,7 +23,9 @@
          @* ficheiro com a fotografia *@
          <div class="form-group">
             <label asp-for="Fotografia" class="control-label"></label>
-            <input asp-for="Fotografia" class="form-control" />
+            @* código original, criado pela Template
+               <input asp-for="Fotografia" class="form-control" />  *@
+            <input type="file" name="fotoCao" accept=".jpg,.jpeg,.png" style="color:blue;" />
             <span asp-validation-for="Fotografia" class="text-danger"></span>
          </div>
 
