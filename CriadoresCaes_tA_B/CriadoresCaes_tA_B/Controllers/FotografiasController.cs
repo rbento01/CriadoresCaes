@@ -63,19 +63,39 @@ namespace CriadoresCaes_tA_B.Controllers {
 
 
       // GET: Fotografias/Details/5
+      /// <summary>
+      /// Mostra os detalhes de uma fotografia
+      /// </summary>
+      /// <param name="id">Identificador da Fotografia</param>
+      /// <returns></returns>
       public async Task<IActionResult> Details(int? id) {
+
          if (id == null) {
-            return NotFound();
+            // entro aqui se não foi especificado o ID
+
+            // redirecionar para a página de início
+            return RedirectToAction("Index");
+
+            //return NotFound();
          }
 
-         var fotografias = await _context.Fotografias
-             .Include(f => f.Cao)
-             .FirstOrDefaultAsync(m => m.Id == id);
-         if (fotografias == null) {
-            return NotFound();
+         // se chego aqui, foi especificado um ID
+         // vou procurar se existe uma Fotografia com esse valor
+         var fotografia = await _context.Fotografias
+                                        .Include(f => f.Cao)
+                                        .FirstOrDefaultAsync(f => f.Id == id);
+
+         if (fotografia == null) {
+            // o ID especificado não corresponde a uma fotografia
+
+            // return NotFound();
+            // redirecionar para a página de início
+            return RedirectToAction("Index");
          }
 
-         return View(fotografias);
+         // se cheguei aqui, é pq a foto existe e foi encontrada
+         // então, mostro-a na View
+         return View(fotografia);
       }
 
 
@@ -213,6 +233,9 @@ namespace CriadoresCaes_tA_B.Controllers {
          return View(foto);
       }
 
+
+
+
       // GET: Fotografias/Edit/5
       public async Task<IActionResult> Edit(int? id) {
          if (id == null) {
@@ -228,6 +251,9 @@ namespace CriadoresCaes_tA_B.Controllers {
 
          return View(fotografias);
       }
+
+
+
 
       // POST: Fotografias/Edit/5
       // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -258,6 +284,8 @@ namespace CriadoresCaes_tA_B.Controllers {
          return View(fotografias);
       }
 
+
+
       // GET: Fotografias/Delete/5
       public async Task<IActionResult> Delete(int? id) {
          if (id == null) {
@@ -274,14 +302,31 @@ namespace CriadoresCaes_tA_B.Controllers {
          return View(fotografias);
       }
 
+
+
+
       // POST: Fotografias/Delete/5
       [HttpPost, ActionName("Delete")]
       [ValidateAntiForgeryToken]
       public async Task<IActionResult> DeleteConfirmed(int id) {
+
          var fotografias = await _context.Fotografias.FindAsync(id);
-         _context.Fotografias.Remove(fotografias);
-         await _context.SaveChangesAsync();
+         try {
+            // Proteger a eliminação de uma foto
+            _context.Fotografias.Remove(fotografias);
+            await _context.SaveChangesAsync();
+
+            // não esquecer, remover o ficheiro da Fotografia do disco rígido
+
+
+         }
+         catch (Exception) {
+
+            throw;
+         }
+
          return RedirectToAction(nameof(Index));
+
       }
 
       private bool FotografiasExists(int id) {
