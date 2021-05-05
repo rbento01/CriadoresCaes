@@ -21,7 +21,7 @@ namespace CriadoresCaes_tA_B.Data {
       // construtor da classe CriadoresCaesDB
       // indicar onde está a BD à qual estas classes (tabelas) serão associadas
       // ver o conteúdo do ficheiro 'startup.cs'
-      public CriadoresCaesDB(DbContextOptions<CriadoresCaesDB> options):base(options) { }
+      public CriadoresCaesDB(DbContextOptions<CriadoresCaesDB> options) : base(options) { }
 
 
       protected override void OnModelCreating(ModelBuilder modelBuilder) {
@@ -109,7 +109,7 @@ namespace CriadoresCaes_tA_B.Data {
       public DbSet<Racas> Racas { get; set; }
       public DbSet<Fotografias> Fotografias { get; set; }
       public DbSet<CriadoresCaes> CriadoresCaes { get; set; }
-
+      public DbSet<Veterinarios> Veterinarios { get; set; }
 
    }
 }

@@ -17,6 +17,8 @@ namespace CriadoresCaes_tA_B.Models {
          ListasDeFotografias = new HashSet<Fotografias>();
          // inicializar a lista de Criadores do cão
          ListaCriadores = new HashSet<CriadoresCaes>();
+         // inicializar a lista dos Vets que trataram o cãozinho
+         ListaVetsTrataramCao = new HashSet<Veterinarios>();
       }
 
       /// <summary>
@@ -85,6 +87,18 @@ namespace CriadoresCaes_tA_B.Models {
       /// Lista dos Criadores associado ao cão
       /// </summary>
       public ICollection<CriadoresCaes> ListaCriadores { get; set; }
+
+
+      //*******************************************************************
+      // Associar os Cães aos Veterinários
+      // à semelhança do executado na classe dos veterinarios, 
+      // vamos ignorar a tabela do relacionamento N-M
+      //*******************************************************************
+      public ICollection<Veterinarios> ListaVetsTrataramCao { get; set; }
+
+
+
+
 
    }
 }
