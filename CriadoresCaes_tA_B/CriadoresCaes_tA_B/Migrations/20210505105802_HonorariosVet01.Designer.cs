@@ -4,14 +4,16 @@ using CriadoresCaes_tA_B.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CriadoresCaes_tA_B.Migrations
 {
     [DbContext(typeof(CriadoresCaesDB))]
-    partial class CriadoresCaesDBModelSnapshot : ModelSnapshot
+    [Migration("20210505105802_HonorariosVet01")]
+    partial class HonorariosVet01
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -609,7 +611,7 @@ namespace CriadoresCaes_tA_B.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<decimal?>("Honorarios")
+                    b.Property<decimal>("Honorarios")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Nome")
