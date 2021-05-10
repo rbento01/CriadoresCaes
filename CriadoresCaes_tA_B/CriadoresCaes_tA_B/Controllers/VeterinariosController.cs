@@ -54,15 +54,49 @@ namespace CriadoresCaes_tA_B.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Honorarios")] Veterinarios veterinarios)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Honorarios")] Veterinarios veterinario)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(veterinarios);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //adicionar o valor do HonorárioAux aos dados a guardar na Base de Dados
+                // converter o valor HonorarioAux para um formato que seja compreendido pela função 'Convert'
+
+                veterinario.HonorarioAux = veterinario.HonorarioAux.Replace('.', '.');
+                // converter e adicionar aos dados que serão guardados na BD
+                veterinario.Honorarios = Convert.ToDecimal(veterinario.HonorarioAux);
+
+                // será que o ID que o utilizador forneceu pode ser usado?
+                // procurar na BD se o ID proposto já existe
+                // SELECT *
+                // FROM Veterinarios
+                // WHERE Id = a um valor fornecido pelo utilizador
+                // v => v.Id == veterinario.Id
+                var _auxVeterinario = await _context.Veterinarios.FirstOrDefaultAsync(veterinario => veterinario.Id == veterinario.Id);
+                // avaliar se posso inserir os dados
+                if (_auxVeterinario == null) {
+                    try {
+                        _context.Add(veterinario);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    } catch (Exception ex) {
+                        // adicionar os dados do erro numa tabela na BD
+                        // - nome da pessoa q está a usar a app
+                        // - data + hora do erro
+                        // - nome do controller
+                        // - nome do método
+                        // - guardar o conteúdo do ex. Message
+                        // - e do ex.StackTrace
+
+                        // escrever os mesmos dados num ficheiro no disco rigido do servidor
+                    }
+                    
+                }
+            } else {
+                // o ID já existe na BD
+                // devolver o controlo à View
+                ModelState.AddModelError("", "O código do veterinário proposto já existe. Adicione um outro, por favor.");
             }
-            return View(veterinarios);
+            return View(veterinario);
         }
 
         // GET: Veterinarios/Edit/5
